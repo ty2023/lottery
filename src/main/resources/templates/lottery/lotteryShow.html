@@ -1,0 +1,177 @@
+<!DOCTYPE html >
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base th:href="|${#request.getContextPath()}/|"/>
+    <meta charset="UTF-8">
+    <title>彩票显示</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="css/style.min.css" rel="stylesheet">
+    <script type="text/javascript" src="js/jquery-3.4.0.js"></script>
+    <link rel="stylesheet" href="layui/css/layui.css">
+    <script type="text/javascript" src="layer/layer.js"></script>
+</head>
+
+<body>
+<div class="lyear-layout-web">
+    <div class="lyear-layout-container">
+        <!--左侧导航-->
+        <aside class="lyear-layout-sidebar">
+            <!-- logo -->
+            <div id="logo" class="sidebar-header">
+                <a href="/"><img src="images/img-index.jpg" style="height: 60px" title="彩票后台" alt="彩票后台" /></a>
+            </div>
+            <div class="lyear-layout-sidebar-scroll">
+
+                <nav class="sidebar-main">
+                    <ul class="nav nav-drawer">
+                        <li class="nav-item active"> <a href="/"><i class="mdi mdi-home"></i> 后台首页</a> </li>
+                        <li class="nav-item nav-item-has-subnav">
+                            <a href="javascript:void(0)"><i class="mdi mdi-palette"></i> 彩票列表</a>
+                            <ul class="nav nav-subnav">
+                                <li th:each="category:${categoryList}"><a th:href="|@{/lottery/getLotteryList(cateId=${category.id})}|" th:text="${category.categoryName}"></a> </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item nav-item-has-subnav" th:if="${user != null}">
+                            <a href="javascript:void(0)"><i class="mdi mdi-format-align-justify"></i>用户管理列表</a>
+                            <ul class="nav nav-subnav">
+                                <li> <a href="/user/getUserPage" th:if="${(user.userRole eq 1)||(user.userRole eq 2)}">用户列表</a> </li>
+                                <li> <a href="lyear_forms_switch.html" th:if="${user.userRole eq 2}">授权</a> </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item nav-item-has-subnav">
+                            <a href="javascript:void(0)"><i class="mdi mdi-language-javascript"></i>订单列表</a>
+                            <ul class="nav nav-subnav">
+                                <li> <a href="lyear_js_datepicker.html">查看订单</a> </li>
+                                <li> <a href="lyear_js_sliders.html">查看进度</a> </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+        </aside>
+        <!--End 左侧导航-->
+
+        <!--头部信息-->
+        <header class="lyear-layout-header">
+
+            <nav class="navbar navbar-default">
+                <div class="topbar">
+
+                    <div class="topbar-left">
+                        <div class="lyear-aside-toggler">
+                            <span class="lyear-toggler-bar"></span>
+                            <span class="lyear-toggler-bar"></span>
+                            <span class="lyear-toggler-bar"></span>
+                        </div>
+                        <span class="navbar-page-title">彩    票</span>
+                    </div>
+
+                    <ul class="topbar-right" th:if="${session.LOGIN_USER != null}">
+                        <li class="dropdown dropdown-profile">
+                            <a href="javascript:void(0)" data-toggle="dropdown">
+                                <span>您的身份是：</span><span th:text="${RoleName}"></span>
+                                <span><span th:text="${user.username}"></span><span class="caret"></span></span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li> <a href="lyear_pages_profile.html"><i class="mdi mdi-account"></i> 个人信息</a> </li>
+                                <li> <a th:href="@{/user/getByUserPassId(id=${user.id})}"><i class="mdi mdi-lock-outline"></i> 修改密码</a> </li>
+                                <li class="divider"></li>
+                                <li> <a href="/toLogout"><i class="mdi mdi-logout-variant"></i> 退出登录</a> </li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <ul class="topbar-right" th:if="${session.LOGIN_USER == null}">
+                        <li class="dropdown dropdown-profile">
+                            <a href="/login" style="color:#009688;">登录</a>
+                            <a href="/register" style="color:#009688;">注册</a>
+
+                        </li>
+                    </ul>
+
+                </div>
+            </nav>
+        </header>
+        <!--End 头部信息-->
+
+        <!--页面主要内容-->
+        <main class="lyear-layout-content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 th:text="${category.categoryName}"></h4>
+                                <div class="fly-list-nums">
+                                    <span>总库存:</span><cite th:text="${category.categoryNum}"></cite>
+                                    <div class="fly-list-nums" th:if="${user!= null}">
+                                        <a href="javascript:;" style="color:#009688;" id="lotteryAdd" th:if="${user.userRole eq 2}">添加彩票</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>编号</th>
+                                        <th>彩票名字</th>
+                                        <th>价格</th>
+                                        <th>库存</th>
+                                        <th>描述</th>
+                                        <th>所属类别</th>
+                                        <th>添加时间</th>
+                                        <div th:if="${session.LOGIN_USER != null}">
+                                            <th>操作</th>
+                                        </div>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="lottery:${lotteryList}">
+                                        <th scope="row" th:text="${lottery.id}">1</th>
+                                        <td th:text="${lottery.lotteryName}"></td>
+                                        <td th:text="${lottery.price}"></td>
+                                        <td th:text="${lottery.lotteryNum}"></td>
+                                        <td th:text="${lottery.desc}"></td>
+                                        <td th:text="${lottery.cateName}"></td>
+                                        <td th:text="${#dates.format(lottery.createTime, 'yyyy-MM-dd')}"></td>
+                                        <td th:if="${session.LOGIN_USER != null}">
+                                            <a href="javascript:;" style="color:#009688;">购买</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </main>
+        <!--End 页面主要内容-->
+    </div>
+</div>
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/perfect-scrollbar.min.js"></script>
+<script type="text/javascript" src="js/main.min.js"></script>
+</body>
+<script type="text/javascript">
+    $(function () {
+        $('#lotteryAdd').click(function () {
+            layer.open({
+                type: 2,
+                title: '添加彩票',
+                shadeClose: true,
+                shade: false,
+                maxmin: true, //开启最大化最小化按钮
+                area: ['893px', '600px'],
+                content: ['/category/selectCategory'],
+                end: function () {
+                    layer.close(index);
+                }
+            });
+        });
+    })
+</script>
+</html>

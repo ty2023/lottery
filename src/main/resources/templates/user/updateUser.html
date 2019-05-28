@@ -1,0 +1,241 @@
+<!DOCTYPE html >
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <base th:href="|${#request.getContextPath()}/|"/>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="js/jquery-3.4.0.js"></script>
+    <link rel="stylesheet" href="layui/css/layui.css">
+    <script type="text/javascript" src="layer/layer.js"></script>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="css/style.min.css" rel="stylesheet">
+    <!--时间选择插件-->
+    <link rel="stylesheet" href="js/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css">
+    <!--日期选择插件-->
+    <link rel="stylesheet" href="js/bootstrap-datepicker/bootstrap-datepicker3.min.css">
+</head>
+
+<body>
+<div class="lyear-layout-web">
+    <div class="lyear-layout-container">
+        <!--左侧导航-->
+        <aside class="lyear-layout-sidebar">
+            <!-- logo -->
+            <div id="logo" class="sidebar-header">
+                <a href="/"><img src="images/img-index.jpg" style="height: 60px" title="彩票后台" alt="彩票后台"/></a>
+            </div>
+            <div class="lyear-layout-sidebar-scroll">
+
+                <nav class="sidebar-main">
+                    <ul class="nav nav-drawer">
+                        <li class="nav-item active"><a href="/"><i class="mdi mdi-home"></i> 后台首页</a></li>
+                        <li class="nav-item nav-item-has-subnav">
+                            <a href="javascript:void(0)"><i class="mdi mdi-palette"></i> 彩票列表</a>
+                            <ul class="nav nav-subnav">
+                                <li th:each="category:${categoryList}"><a
+                                        th:href="|@{/lottery/getLotteryList(cateId=${category.id})}|"
+                                        th:text="${category.categoryName}"></a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item nav-item-has-subnav" th:if="${user != null}">
+                            <a href="javascript:void(0)"><i class="mdi mdi-format-align-justify"></i>用户管理列表</a>
+                            <ul class="nav nav-subnav">
+                                <li><a href="/user/getUserPage" th:if="${(user.userRole eq 1)||(user.userRole eq 2)}">用户列表</a>
+                                </li>
+                                <li><a href="lyear_forms_switch.html" th:if="${user.userRole eq 2}">授权</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item nav-item-has-subnav">
+                            <a href="javascript:void(0)"><i class="mdi mdi-language-javascript"></i>订单列表</a>
+                            <ul class="nav nav-subnav">
+                                <li><a href="lyear_js_datepicker.html">查看订单</a></li>
+                                <li><a href="lyear_js_sliders.html">查看进度</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+        </aside>
+        <!--End 左侧导航-->
+
+        <!--头部信息-->
+        <header class="lyear-layout-header">
+
+            <nav class="navbar navbar-default">
+                <div class="topbar">
+
+                    <div class="topbar-left">
+                        <div class="lyear-aside-toggler">
+                            <span class="lyear-toggler-bar"></span>
+                            <span class="lyear-toggler-bar"></span>
+                            <span class="lyear-toggler-bar"></span>
+                        </div>
+                        <span class="navbar-page-title">个人信息展示以及修改 </span>
+                    </div>
+
+                    <ul class="topbar-right" th:if="${session.LOGIN_USER != null}">
+                        <li class="dropdown dropdown-profile">
+                            <a href="javascript:void(0)" data-toggle="dropdown">
+                                <span>您的身份是：</span><span th:text="${RoleName}"></span>
+                                <span><span th:text="${login_user.username}"></span><span class="caret"></span></span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li><a href="lyear_pages_profile.html"><i class="mdi mdi-account"></i> 个人信息</a></li>
+                                <li><a th:href="@{/user/getByUserPassId(id=${login_user.id})}"><i
+                                        class="mdi mdi-lock-outline"></i> 修改密码</a></li>
+                                <li class="divider"></li>
+                                <li><a href="/toLogout"><i class="mdi mdi-logout-variant"></i> 退出登录</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <ul class="topbar-right" th:if="${session.LOGIN_USER == null}">
+                        <li class="dropdown dropdown-profile">
+                            <a href="/login" style="color:#009688;">登录</a>
+                            <a href="/register" style="color:#009688;">注册</a>
+                        </li>
+                    </ul>
+
+                </div>
+            </nav>
+
+        </header>
+        <!--End 头部信息-->
+
+        <!--页面主要内容-->
+        <main class="lyear-layout-content">
+
+            <div class="container-fluid">
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-body">
+
+                                <form method="post" action="#!" class="site-form">
+                                    <input type="hidden" id="id" th:value="${user.id}">
+                                    <div class="form-group">
+                                        <label>用户名</label>
+                                        <input type="text" class="form-control" readonly="readonly" name="username"
+                                               id="username" th:value="${user.username}" placeholder="请输入用户名">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>真实姓名</label>
+                                        <input type="text" class="form-control" name="trueName"
+                                               th:value="${user.trueName}" id="trueName" placeholder="请输入您的真实姓名">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>年龄</label>
+                                        <input type="text" class="form-control" name="age" th:value="${user.age}"
+                                               id="age" placeholder="请输入年龄">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>性别</label>
+                                        <label class="lyear-radio radio-inline radio-primary">
+                                            <input type="radio" name="sex" th:checked="${user.sex eq 1}"
+                                                   value="1"><span>男</span>
+                                        </label>
+                                        <label class="lyear-radio radio-inline radio-primary">
+                                            <input type="radio" name="sex" th:checked="${user.sex eq 0}"
+                                                   value="0"><span>女</span>
+                                        </label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>邮箱</label>
+                                        <input type="email" class="form-control" readonly="readonly" name="email"
+                                               id="email" th:value="${user.email}" placeholder="请输入邮箱上号">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>联系电话</label>
+                                        <input type="text" class="form-control" readonly="readonly" name="phone"
+                                               id="phone" th:value="${user.phone}" placeholder="请输入邮箱上号">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>生日</label>
+                                        <input class="form-control js-datepicker m-b-10" type="text" id="birthday"
+                                               th:value="${#dates.format(user.birthday, 'yyyy-MM-dd')}" name="birthday"
+                                               placeholder="请选择您的生日" data-date-format="yyyy-mm-dd"/>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>社交账号(QQ)</label>
+                                        <input type="text" class="form-control" th:value="${user.qq}" name="qq" id="qq"
+                                               placeholder="请输入社交账号">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>地址</label>
+                                        <input type="text" class="form-control" name="address"
+                                               th:value="${user.address}" id="address" placeholder="请输入地址">
+                                    </div>
+                                    <button type="button" onclick="toUpdateUser()" class="btn btn-primary">修改个人信息</button>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+        <!--End 页面主要内容-->
+    </div>
+</div>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/perfect-scrollbar.min.js"></script>
+<script type="text/javascript" src="js/main.min.js"></script>
+</body>
+<script type="text/javascript">
+    /**
+     * 添加用户
+     */
+    function toUpdateUser() {
+        var param = {};
+        param.id = $('#id').val();
+        param.username = $('#username').val();
+        param.password = $('#password').val();
+        param.trueName = $('#trueName').val();
+        param.sex = $('form input:radio:checked').val();
+        param.age = $('#age').val();
+        param.birthday = $('#birthday').val();
+        param.email = $('#email').val();
+        param.phone = $('#phone').val();
+        param.qq = $('#qq').val();
+        param.address = $('#address').val();
+        if (pd(param)) {
+            $.post('user/updateUser', param, function (data) {
+                if (data.fl == 'true') {
+                    layer.msg(data.msg, {icon: 6, time: 1500}, function () {
+                        location.href = '/user/getUserPage';
+                    });
+                } else {
+                    layer.msg(data.msg, {icon: 5, time: 1000, anim: 6}, function () {
+                        window.location.reload();
+                    });
+                }
+            }, "json")
+        } else {
+            layer.msg('所有项都不能为空', {icon: 5, time: 1000, anim: 6}, function () {
+                window.location.reload();
+            });
+        }
+
+    }
+
+    /**
+     * 判断非空
+     * @param param
+     * @returns {boolean}
+     */
+    function pd(param) {
+        for (var i in param) {
+            if (param[i] == "") {
+                return false;
+            }
+        }
+        return true;
+    }
+</script>
+</html>

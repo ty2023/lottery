@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+        <!DOCTYPE mapper
+                PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bysj.dao.LotteryMapper">
+<resultMap id="lotteryMap" type="lottery">
+    <id property="id"                    column="id"/>
+    <result property="lotteryName"       column="name"/>
+    <result property="cateId"            column="cateId"/>
+    <result property="cateName"          column="cateName"/>
+    <result property="price"             column="price"/>
+    <result property="categoryDesc"      column="cateDesc"/>
+    <result property="desc"              column="desc"/>
+    <result property="lotteryNum"        column="lottery_nu"/>
+    <result property="createTime"        column="create_time"/>
+</resultMap>
+
+    <select id="getLotteryList" resultMap="lotteryMap">
+        select
+            lottery.*,
+            category.id as cateId,
+            category.name as cateName,
+            category.desc as cateDesc
+        from
+            t_lottery lottery,
+            t_category category
+        where
+            lottery.cate_id=category.id
+        and
+            lottery.cate_id=#{cateId};
+    </select>
+
+</mapper>

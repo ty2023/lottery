@@ -1,0 +1,206 @@
+<!DOCTYPE html >
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base th:href="|${#request.getContextPath()}/|"/>
+    <meta charset="UTF-8">
+    <title>用户列表</title>
+    <script type="text/javascript" src="js/jquery-3.4.0.js"></script>
+    <link rel="stylesheet" href="layui/css/layui.css">
+    <script type="text/javascript" src="layer/layer.js"></script>
+    <link rel="stylesheet" href="js/jconfirm/jquery-confirm.min.css">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="css/style.min.css" rel="stylesheet">
+</head>
+
+<body>
+<div class="lyear-layout-web">
+    <div class="lyear-layout-container">
+        <!--左侧导航-->
+        <aside class="lyear-layout-sidebar">
+            <!-- logo -->
+            <div id="logo" class="sidebar-header">
+                <a href="/"><img src="images/img-index.jpg" style="height: 60px" title="彩票后台" alt="彩票后台" /></a>
+            </div>
+            <div class="lyear-layout-sidebar-scroll">
+
+                <nav class="sidebar-main">
+                    <ul class="nav nav-drawer">
+                        <li class="nav-item active"> <a href="/"><i class="mdi mdi-home"></i> 后台首页</a> </li>
+                        <li class="nav-item nav-item-has-subnav">
+                            <a href="javascript:void(0)"><i class="mdi mdi-palette"></i> 彩票列表</a>
+                            <ul class="nav nav-subnav">
+                                <li th:each="category:${categoryList}"><a th:href="|@{/lottery/getLotteryList(cateId=${category.id})}|" th:text="${category.categoryName}"></a> </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item nav-item-has-subnav" th:if="${user != null}">
+                            <a href="javascript:void(0)"><i class="mdi mdi-format-align-justify"></i>用户管理列表</a>
+                            <ul class="nav nav-subnav">
+                                <li> <a href="/user/getUserPage" th:if="${(user.userRole eq 1)||(user.userRole eq 2)}">用户列表</a> </li>
+                                <li> <a href="lyear_forms_switch.html" th:if="${user.userRole eq 2}">授权</a> </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item nav-item-has-subnav">
+                            <a href="javascript:void(0)"><i class="mdi mdi-file-outline"></i>购物车</a>
+                            <ul class="nav nav-subnav">
+                                <li> <a href="lyear_pages_doc.html">查看购物车</a> </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item nav-item-has-subnav">
+                            <a href="javascript:void(0)"><i class="mdi mdi-language-javascript"></i>订单列表</a>
+                            <ul class="nav nav-subnav">
+                                <li> <a href="lyear_js_datepicker.html">查看订单</a> </li>
+                                <li> <a href="lyear_js_sliders.html">查看进度</a> </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+        </aside>
+        <!--End 左侧导航-->
+
+        <!--头部信息-->
+        <header class="lyear-layout-header">
+
+            <nav class="navbar navbar-default">
+                <div class="topbar">
+
+                    <div class="topbar-left">
+                        <div class="lyear-aside-toggler">
+                            <span class="lyear-toggler-bar"></span>
+                            <span class="lyear-toggler-bar"></span>
+                            <span class="lyear-toggler-bar"></span>
+                        </div>
+                        <span class="navbar-page-title">彩    票</span>
+                    </div>
+
+                    <ul class="topbar-right" th:if="${session.LOGIN_USER != null}">
+                        <li class="dropdown dropdown-profile">
+                            <a href="javascript:void(0)" data-toggle="dropdown">
+                                <span>您的身份是：</span><span th:text="${RoleName}"></span>
+                                <span><span th:text="${user.username}"></span><span class="caret"></span></span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li> <a href="lyear_pages_profile.html"><i class="mdi mdi-account"></i> 个人信息</a> </li>
+                                <li> <a th:href="@{/user/getByUserPassId(id=${user.id})}"><i class="mdi mdi-lock-outline"></i> 修改密码</a> </li>
+                                <li class="divider"></li>
+                                <li> <a href="/toLogout"><i class="mdi mdi-logout-variant"></i> 退出登录</a> </li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <ul class="topbar-right" th:if="${session.LOGIN_USER == null}">
+                        <li class="dropdown dropdown-profile">
+                                <a href="/login" style="color:#009688;">登录</a>
+                                <a href="/register" style="color:#009688;">注册</a>
+                        </li>
+                    </ul>
+
+                </div>
+            </nav>
+        </header>
+        <!--End 头部信息-->
+
+        <!--页面主要内容-->
+        <main class="lyear-layout-content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>用户列表</h4>
+                                <ul class="topbar-right" th:if="${session.LOGIN_USER != null}">
+                                    <li class="dropdown dropdown-profile" th:if="${session.LOGIN_USER.userRole eq 2}">
+                                        <a href="/user/addUser" style="color:#009688;">添加用户</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>编号</th>
+                                        <th>姓名</th>
+                                        <th>生日</th>
+                                        <th>性别</th>
+                                        <th>年龄</th>
+                                        <th>真实姓名</th>
+                                        <th>邮箱</th>
+                                        <th>联系方式</th>
+                                        <th>社交账号</th>
+                                        <th>地址</th>
+                                        <div th:if="${user != null}">
+                                            <th th:if="${(user.userRole eq 1)||(user.userRole eq 2)}">操作</th>
+                                        </div>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="user:${userList}">
+                                        <th scope="row" th:text="${user.id}">1</th>
+                                        <td th:text="${user.username}"></td>
+                                        <td th:text="${#dates.format(user.birthday, 'yyyy-MM-dd')}"></td>
+                                        <td th:text="${user.sex eq 1?'男':'女'}"></td>
+                                        <td th:text="${user.age}"></td>
+                                        <td th:text="${user.trueName}"></td>
+                                        <td th:text="${user.email}"></td>
+                                        <td th:text="${user.phone}"></td>
+                                        <td th:text="${user.qq}"></td>
+                                        <td th:text="${user.address}"></td>
+                                        <div th:if="${session.LOGIN_USER != null}">
+                                            <td th:if="${(session.LOGIN_USER.userRole eq 1)||(session.LOGIN_USER.userRole eq 2)}">
+                                                <a th:href="|@{/user/getByUserId(id=${user.id})}|" style="color:#009688;">编辑</a>
+                                                <a href="javascript:;" th:onclick="|deleteUser(${user.id})|"  style="color:#009688;">删除</a>
+                                            </td>
+                                        </div>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!--End 页面主要内容-->
+    </div>
+</div>
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/perfect-scrollbar.min.js"></script>
+<script type="text/javascript" src="js/main.min.js"></script>
+<script type="text/javascript" src="js/jconfirm/jquery-confirm.min.js"></script>
+</body>
+<script type="text/javascript">
+    function deleteUser(id) {
+        $.confirm({
+            title: '删除提示',
+            content: '是否删除编号为'+id+'的用户',
+            buttons: {
+                confirm: {
+                    text: '确认',
+                    action: function(){
+                        $.get('/user/deleteUser',{'id':id},function(data) {
+                            alert(data.fl);
+                            if (data.fl == 'true'){
+                                layer.msg(data.msg, {icon: 6 , time: 1500},function () {
+                                    window.location.reload();
+                                });
+                            }else {
+                                layer.msg(data.msg, {icon: 5 , time: 1500 , anim: 6},function () {
+                                    window.location.reload();
+                                });
+                            }
+                        },"JSON");
+                    }
+                },
+                cancel: {
+                    text: '取消',
+                    action: function () {
+                    }
+                }
+            }
+        });
+    }
+</script>
+</html>

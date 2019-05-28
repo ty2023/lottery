@@ -1,0 +1,210 @@
+<!DOCTYPE html >
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base th:href="|${#request.getContextPath()}/|"/>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="js/jquery-3.4.0.js"></script>
+    <link rel="stylesheet" href="layui/css/layui.css">
+    <script type="text/javascript" src="layer/layer.js"></script>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="css/style.min.css" rel="stylesheet">
+    <!--时间选择插件-->
+    <link rel="stylesheet" href="js/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css">
+    <!--日期选择插件-->
+    <link rel="stylesheet" href="js/bootstrap-datepicker/bootstrap-datepicker3.min.css">
+    <style>
+        .lyear-wrapper {
+            position: relative;
+        }
+        .lyear-login {
+            display: flex !important;
+            min-height: 100vh;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        .login-center {
+            background: #fff;
+            min-width: 38.25rem;
+            padding: 2.14286em 3.57143em;
+            border-radius: 5px;
+            margin: 2.85714em 0;
+        }
+        .login-header {
+            margin-bottom: 1.5rem !important;
+        }
+        .login-center .has-feedback.feedback-left .form-control {
+            padding-left: 38px;
+            padding-right: 12px;
+        }
+        .login-center .has-feedback.feedback-left .form-control-feedback {
+            left: 0;
+            right: auto;
+            width: 38px;
+            height: 38px;
+            line-height: 38px;
+            z-index: 4;
+            color: #dcdcdc;
+        }
+        .login-center .has-feedback.feedback-left.row .form-control-feedback {
+            left: 15px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="row lyear-wrapper">
+    <div class="lyear-login">
+        <div class="login-center">
+            <div class="login-header text-center">
+                <a href="/"> <span alt="light year admin" >欢迎注册</span></a>
+            </div>
+            <form action="#!" method="post">
+                <div class="form-group has-feedback feedback-left">
+                    <input type="text" placeholder="请输入您的用户名" class="form-control" name="username" id="username" />
+                    <span class="mdi mdi-account form-control-feedback" aria-hidden="true" ></span>
+                </div>
+                <div class="form-group has-feedback feedback-left">
+                    <input type="text" placeholder="请输入您的真实姓名" class="form-control" name="trueName" id="trueName" />
+                    <span class="mdi mdi-account form-control-feedback" aria-hidden="true"></span>
+                </div>
+                <div class="form-group has-feedback feedback-left">
+                    <input type="password" placeholder="请输入密码" class="form-control" id="password" name="password" />
+                    <span class="mdi mdi-lock form-control-feedback" aria-hidden="true"></span>
+                </div>
+                <div class="form-group has-feedback feedback-left">
+                    <input type="password" placeholder="请输入年龄" class="form-control" id="age" name="age" />
+                </div>
+                <div class="form-group has-feedback feedback-left">
+                    <label class="lyear-radio radio-inline radio-primary">
+                        <input type="radio" name="sex" checked value="1"><span>男</span>
+                    </label>
+                    <label class="lyear-radio radio-inline radio-primary">
+                        <input type="radio" name="sex" value="0" ><span>女</span>
+                    </label>
+                </div>
+                <div class="form-group has-feedback feedback-left">
+                    <input class="form-control js-datepicker m-b-10" type="text" id="birthday"
+                           name="birthday" placeholder="请选择您的生日" data-date-format="yyyy-mm-dd" />
+                </div>
+                <div class="form-group has-feedback feedback-left">
+                    <input type="email" placeholder="请输入您的邮箱" class="form-control" name="email" id="email" />
+                </div>
+                <div class="form-group has-feedback feedback-left">
+                    <input type="text" placeholder="请输入您的联系方式" class="form-control" name="phone" id="phone" />
+                </div>
+                <div class="form-group has-feedback feedback-left">
+                    <input type="text" placeholder="请输入您的社交账号(QQ)" class="form-control" name="qq" id="qq" />
+                </div>
+                <div class="form-group has-feedback feedback-left">
+                    <input type="text" placeholder="请输入您的地址" class="form-control" name="address" id="address" />
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-block btn-primary" type="button" onclick="toRegister()">立即注册</button>
+                </div>
+            </form>
+            <hr>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+<!--时间选择插件-->
+<script src="js/bootstrap-datetimepicker/moment.min.js"></script>
+<script src="js/bootstrap-datetimepicker/bootstrap-datetimepicker.min.js"></script>
+<script src="js/bootstrap-datetimepicker/locale/zh-cn.js"></script>
+<!--日期选择插件-->
+<script src="js/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+<script src="js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js"></script>
+<script type="text/javascript" src="js/main.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#username').blur(function () {
+            var username = $('#username').val();
+            $.get('user/getByUserName',{'username':username},function (data) {
+                if (data.fl == 'true'){
+                }else {
+                    layer.msg(data.msg, {icon: 5,time : 1000 , anim: 6},function () {
+                        $('#username').val("");
+                    });
+                }
+            },"JSON");
+        });
+
+        $('#email').blur(function () {
+            var email = $('#email').val();
+            $.get('user/getByEmail',{'email':email},function (data) {
+                if (data.fl == 'true'){
+                }else {
+                    layer.msg(data.msg, {icon: 5,time : 1000, anim: 6},function () {
+                        $('#email').val("");
+                    });
+                }
+            },"JSON");
+        });
+
+        $('#phone').blur(function () {
+            var phone = $('#phone').val();
+            $.get('user/getByPhone',{'phone':phone},function (data) {
+                if (data.fl == 'true'){
+                }else {
+                    layer.msg(data.msg, {icon: 5,time : 1000},function () {
+                        $('#phone').val("");
+                    });
+                }
+            },"JSON");
+        });
+    })
+
+
+    /**
+     * 注册
+     */
+    function toRegister() {
+        var param = {};
+        param.username = $('#username').val();
+        param.password = $('#password').val();
+        param.trueName = $('#trueName').val();
+        param.sex = $('form input:radio:checked').val();
+        param.age = $('#age').val();
+        param.birthday = $('#birthday').val();
+        param.email = $('#email').val();
+        param.phone = $('#phone').val();
+        param.qq = $('#qq').val();
+        param.address = $('#address').val();
+       if (pd(param)){
+           $.post('user/toRegister',param,function (data) {
+               if (data.fl == 'true'){
+                   layer.msg(data.msg, {icon: 6,time:1500},function () {
+                       location.href = '/login';
+                   });
+               }else {
+                   layer.msg(data.msg, {icon: 5,time : 1000, anim: 6},function () {
+                       window.location.reload();
+                   });
+               }
+           },"json")
+       }else {
+           layer.msg('所有项都不能为空', {icon: 5,time : 1000, anim: 6},function () {
+               window.location.reload();
+           });
+       }
+
+    }
+
+    /**
+     * 判断非空
+     * @param param
+     * @returns {boolean}
+     */
+    function pd(param){
+        for(var i in param){
+            if (param[i] == ""){
+                return false;
+            }
+        }
+        return true;
+    }
+</script>
+</body>
+</html>
